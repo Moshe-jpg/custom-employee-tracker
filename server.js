@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const inquirer = require("inquirer");
 const db = require("./db/connection");
-const cTable = require('console.table');
+const cTable = require("console.table");
 const e = require("express");
 
 const options = () => {
@@ -58,58 +58,107 @@ const yourChoice = (answer) => {
   }
 };
 
+// add an employee with the following 2 functions
+const addEmployee = () => {
+  inquirer
+    .prompt(
+      {
+        type: "input",
+        name: "newEmployeeFirstName",
+        message: "What is your new employees 1st name?",
+        validate: (newEmployeeFirstNameInput) => {
+          if (newEmployeeFirstNameInput) {
+            return true;
+          } else {
+            console.log("Please enter the employees 1st name!");
+            return false;
+          }
+        },
+      },
+      {
+        type: "input",
+        name: "newEmployeeLastName",
+        message: "What is your new employees last name?",
+        validate: (newEmployeeLastNameInput) => {
+          if (newEmployeeLastNameInput) {
+            return true;
+          } else {
+            console.log("Please enter the employees last name!");
+            return false;
+          }
+        },
+      }
+    )
+    .then((answer) => {
+      handleAddEmployee(answer);
+    });
+};
 
-const updateRole = () => {
-  const sql = `SELECT * FROM employee`;
-  db.query(sql,(err, res) => {
+const handleAddEmployee = (answer) => {
+  const newEmployeeFirstName = answer.newEmployeeFirstName;
+  const newEmployeeLastName = answer.newEmployeeLastName;
+  const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${newEmployeeFirstName}", "${newEmployeeLastName}", 1, null);`;
+  db.query(sql, (err, res) => {
     if (err) {
       console.log(err);
-    };
-    const employees = res.map(({id, first_name, last_name}) => ({
+    }
+    console.log("Your new employee was added to the database!");
+  });
+};
+
+// update a role with the following 2 functions
+const updateRole = () => {
+  const sql = `SELECT * FROM employee`;
+  db.query(sql, (err, res) => {
+    if (err) {
+      console.log(err);
+    }
+    const employees = res.map(({ id, first_name, last_name }) => ({
       value: id,
-      name: `${first_name} ${last_name}`
-    }))
-    inquirer.prompt ({
-      type: 'list',
-      name: 'employee_id',
-      message: 'Which employees role would you like to update',
-      choices: employees  
-    })
-    .then(answer => {
-      let employee_id = answer.employee_id;
-      const sql = `SELECT role.id, role.title FROM role`;
-      db.query(sql,(err, res) => {
-        if (err) {
-          console.log(err);
-        }
-        const roleChoices = res.map(({id, title}) => ({
-          value: id,
-          name: `${title}`
-        }))
-        handleUpdate(employee_id, roleChoices);
+      name: `${first_name} ${last_name}`,
+    }));
+    inquirer
+      .prompt({
+        type: "list",
+        name: "employee_id",
+        message: "Which employees role would you like to update",
+        choices: employees,
       })
-    })
-  })
+      .then((answer) => {
+        let employee_id = answer.employee_id;
+        const sql = `SELECT role.id, role.title FROM role`;
+        db.query(sql, (err, res) => {
+          if (err) {
+            console.log(err);
+          }
+          const roleChoices = res.map(({ id, title }) => ({
+            value: id,
+            name: `${title}`,
+          }));
+          handleUpdate(employee_id, roleChoices);
+        });
+      });
+  });
 };
 
 const handleUpdate = (employee_id, roleChoices) => {
-  inquirer.prompt({
-    type: 'list',
-    name: 'role',
-    message: 'What is the updated role?',
-    choices: roleChoices
-  })
-  .then(answer => {
-    const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
-    const params = [answer.role, employee_id];
-    db.query(sql, params, (err, res) => {
-      if (err) {
-        console.log(err);
-      };
-      console.log("Your role was updated!");
+  inquirer
+    .prompt({
+      type: "list",
+      name: "role",
+      message: "What is the updated role?",
+      choices: roleChoices,
     })
-  })
-}
+    .then((answer) => {
+      const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
+      const params = [answer.role, employee_id];
+      db.query(sql, params, (err, res) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log("Your role was updated!");
+      });
+    });
+};
 
 options();
-
