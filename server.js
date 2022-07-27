@@ -58,10 +58,73 @@ const yourChoice = (answer) => {
   }
 };
 
+// add a role with the following 2 functions
+const addRole = () => {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "addRoleTitle",
+        message: "What role would you like to add?",
+        validate: (addRoleInput) => {
+          if (addRoleInput) {
+            return true;
+          } else {
+            console.log("Please enter a role!");
+            return false;
+          }
+        },
+      },
+      {
+        type: "input",
+        name: "addRoleSalary",
+        message: "What is the role salary?",
+        validate: (addRoleInput) => {
+          if (addRoleInput) {
+            return true;
+          } else {
+            console.log("Please enter a salary!");
+            return false;
+          }
+        },
+      },
+    ])
+    .then((answer) => {
+      addDeptToRole(answer);
+    });
+};
+
+const addDeptToRole = (roleAnswers) => {
+  console.log(roleAnswers);
+  let deptList = db.query("SELECT * FROM department", (err, res) => {
+    if (err) {
+      console.log(err);
+    }
+    
+    inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "deptChoices",
+        message: "Which department does this role belong to?",
+        choices: res
+      },
+    ])
+    .then((answer) => {
+      let finalAnswers = roleAnswers;
+      finalAnswers.deptChoices = answer.deptChoices;
+      console.log(finalAnswers);
+      handleAddRole(finalAnswers);
+    });
+  });
+};
+
+const handleAddRole = (answer) => {};
+
 // add an employee with the following 2 functions
 const addEmployee = () => {
   inquirer
-    .prompt(
+    .prompt([
       {
         type: "input",
         name: "newEmployeeFirstName",
@@ -87,8 +150,8 @@ const addEmployee = () => {
             return false;
           }
         },
-      }
-    )
+      },
+    ])
     .then((answer) => {
       handleAddEmployee(answer);
     });
@@ -102,7 +165,10 @@ const handleAddEmployee = (answer) => {
     if (err) {
       console.log(err);
     }
-    console.log("Your new employee was added to the database!");
+    console.log(
+      `${newEmployeeFirstName} ${newEmployeeLastName} was added to the database!`
+    );
+    return options();
   });
 };
 
@@ -157,6 +223,7 @@ const handleUpdate = (employee_id, roleChoices) => {
           console.log(err);
         }
         console.log("Your role was updated!");
+        return options();
       });
     });
 };
