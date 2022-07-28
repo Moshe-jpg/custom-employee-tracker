@@ -42,7 +42,7 @@ const yourChoice = (answer) => {
   }
 
   if (answer.nextMove === "Add a department") {
-    viewADepartment();
+    addADepartment();
   }
 
   if (answer.nextMove === "Add a role") {
@@ -56,6 +56,76 @@ const yourChoice = (answer) => {
   if (answer.nextMove === "Update an employee role") {
     updateRole();
   }
+};
+
+// view all departments with the following function
+const viewDepartments = () => {
+  const sql = `SELECT * FROM department;`;
+  db.query(sql, (err, res) => {
+    if (err) {
+      console.log(err);
+    }
+    console.log(res);
+    return options();
+  });
+};
+
+// view all roles with the following function
+const viewRoles = () => {
+  const sql = `SELECT * FROM role;`;
+  db.query(sql, (err, res) => {
+    if (err) {
+      console.log(err);
+    }
+    console.log(res);
+    return options();
+  });
+};
+
+// view all employees with the following function
+const viewEmployees = () => {
+  const sql = `SELECT * FROM employee;`;
+  db.query(sql, (err, res) => {
+    if (err) {
+      console.log(err);
+    }
+    console.log(res);
+    return options();
+  });
+};
+
+// Add a Department with the following function
+const addADepartment = () => {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "departmentName",
+        message: "What do you want to call the department?",
+        validate: (departmentNameInput) => {
+          if (departmentNameInput) {
+            return true;
+          } else {
+            console.log("Please enter a name for the department!");
+            return false;
+          }
+        },
+      },
+    ])
+    .then((answer) => {
+      const departmentName = answer.departmentName;
+      const sql = `INSERT INTO department (name) VALUES ("${departmentName}");`;
+      db.query(sql, (err, res) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(
+            `Successfully added the ${departmentName} department to the database!`
+          );
+          return options();
+        }
+      });
+    });
 };
 
 // add a role with the following 3 functions
@@ -96,26 +166,29 @@ const addRole = () => {
 
 const addDeptToRole = (roleAnswers) => {
   console.log(roleAnswers);
-  let deptList = db.query("SELECT * FROM department", (err, res) => {
+  db.query("SELECT * FROM department", (err, res) => {
     if (err) {
       console.log(err);
     }
-    
+    let deptChoice = res.map(({ id, name }) => ({
+      name: name,
+      value: id,
+    }));
     inquirer
-    .prompt([
-      {
-        type: "list",
-        name: "deptChoices",
-        message: "Which department does this role belong to?",
-        choices: res
-      },
-    ])
-    .then((answer) => {
-      let finalAnswers = roleAnswers;
-      finalAnswers.deptChoices = answer.deptChoices;
-      console.log(finalAnswers);
-      handleAddRole(finalAnswers);
-    });
+      .prompt([
+        {
+          type: "list",
+          name: "deptChoices",
+          message: "Which department does this role belong to?",
+          choices: deptChoice,
+        },
+      ])
+      .then((answer) => {
+        let finalAnswers = roleAnswers;
+        finalAnswers.deptChoices = answer.deptChoices;
+        console.log(finalAnswers);
+        handleAddRole(finalAnswers);
+      });
   });
 };
 
@@ -126,7 +199,7 @@ const handleAddRole = (finalAnswers) => {
       console.log(err);
     }
     console.log("New role added to database!");
-  })
+  });
 };
 
 // add an employee with the following 2 functions
