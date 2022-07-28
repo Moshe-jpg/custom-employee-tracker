@@ -65,7 +65,7 @@ const viewDepartments = () => {
     if (err) {
       console.log(err);
     }
-    console.log(res);
+    console.table(res);
     return options();
   });
 };
@@ -77,7 +77,7 @@ const viewRoles = () => {
     if (err) {
       console.log(err);
     }
-    console.log(res);
+    console.table(res);
     return options();
   });
 };
@@ -89,7 +89,7 @@ const viewEmployees = () => {
     if (err) {
       console.log(err);
     }
-    console.log(res);
+    console.table(res);
     return options();
   });
 };
