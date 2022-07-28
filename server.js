@@ -58,7 +58,7 @@ const yourChoice = (answer) => {
   }
 };
 
-// add a role with the following 2 functions
+// add a role with the following 3 functions
 const addRole = () => {
   inquirer
     .prompt([
@@ -66,8 +66,8 @@ const addRole = () => {
         type: "input",
         name: "addRoleTitle",
         message: "What role would you like to add?",
-        validate: (addRoleInput) => {
-          if (addRoleInput) {
+        validate: (addRoleTitleInput) => {
+          if (addRoleTitleInput) {
             return true;
           } else {
             console.log("Please enter a role!");
@@ -79,8 +79,8 @@ const addRole = () => {
         type: "input",
         name: "addRoleSalary",
         message: "What is the role salary?",
-        validate: (addRoleInput) => {
-          if (addRoleInput) {
+        validate: (addRoleSalaryInput) => {
+          if (addRoleSalaryInput) {
             return true;
           } else {
             console.log("Please enter a salary!");
@@ -119,7 +119,15 @@ const addDeptToRole = (roleAnswers) => {
   });
 };
 
-const handleAddRole = (answer) => {};
+const handleAddRole = (finalAnswers) => {
+  const sql = `INSERT INTO role (title, salary, department_id) VALUES ("${finalAnswers.addRoleTitle}", ${finalAnswers.addRoleSalary}, "${finalAnswers.deptChoices}");`;
+  db.query(sql, (err, res) => {
+    if (err) {
+      console.log(err);
+    }
+    console.log("New role added to database!");
+  })
+};
 
 // add an employee with the following 2 functions
 const addEmployee = () => {
