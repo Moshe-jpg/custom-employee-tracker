@@ -3,7 +3,6 @@ require("dotenv").config();
 const inquirer = require("inquirer");
 const db = require("./db/connection");
 const cTable = require("console.table");
-const e = require("express");
 
 const options = () => {
   return inquirer
@@ -165,7 +164,6 @@ const addRole = () => {
 };
 
 const addDeptToRole = (roleAnswers) => {
-  console.log(roleAnswers);
   db.query("SELECT * FROM department", (err, res) => {
     if (err) {
       console.log(err);
