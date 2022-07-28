@@ -198,7 +198,8 @@ const handleAddRole = (finalAnswers) => {
     if (err) {
       console.log(err);
     }
-    console.log("New role added to database!");
+    console.log(`New role "${finalAnswers.addRoleTitle} added to database!`);
+    return options();
   });
 };
 
@@ -232,6 +233,19 @@ const addEmployee = () => {
           }
         },
       },
+      {
+        type: "input",
+        name: "newEmployeeManager",
+        message: "Who is your new employees manager?",
+        validate: (newEmployeeManagerInput) => {
+          if (newEmployeeManagerInput) {
+            return true;
+          } else {
+            console.log("Please enter the employee's managers name!");
+            return false;
+          }
+        },
+      },
     ])
     .then((answer) => {
       handleAddEmployee(answer);
@@ -241,7 +255,8 @@ const addEmployee = () => {
 const handleAddEmployee = (answer) => {
   const newEmployeeFirstName = answer.newEmployeeFirstName;
   const newEmployeeLastName = answer.newEmployeeLastName;
-  const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${newEmployeeFirstName}", "${newEmployeeLastName}", 1, null);`;
+  const newEmployeeManager = answer.newEmployeeManager;
+  const sql = `INSERT INTO employee (first_name, last_name, role_id, manager) VALUES ("${newEmployeeFirstName}", "${newEmployeeLastName}", 1, "${newEmployeeManager}");`;
   db.query(sql, (err, res) => {
     if (err) {
       console.log(err);
